@@ -1,0 +1,14 @@
+{
+    "name": "drupal/daterange_argument",
+    "description": "Allows Views to filter date ranges on a single date.",
+    "type": "drupal-custom-module",
+    "authors": [
+        {
+            "name": "Frédéric Bisson",
+            "homepage": "https://www.drupal.org/u/zigazou",
+            "role": "Maintainer"
+        }
+    ],
+    "license": "GPL-3.0+",
+    "minimum-stability": "dev"
+}
