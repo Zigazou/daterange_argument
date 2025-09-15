@@ -1,9 +1,8 @@
 <?php
 
-namespace Drupal\views\Plugin\views\argument;
+namespace Drupal\daterange_argument\Plugin\views\argument;
 
 use Drupal\views\Attribute\ViewsArgument;
-use Drupal\views\Plugin\views\argument\Date;
 
 /**
  * Argument handler for date ranges.
