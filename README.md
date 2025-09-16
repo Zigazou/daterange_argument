@@ -2,8 +2,12 @@
 
 Daterange Argument is a Drupal module that provides a custom Views argument
 handler for filtering date ranges on a specific date. This module allows users
-to pass a date argument in the URL, enabling flexible filtering of entities
-based on date range fields.
+to pass a date argument in the URL and retrieve all date ranges that include
+that particular date.
+
+It is based on the Contextual Range Filter (8.x-2.x)
+https://www.drupal.org/project/contextual_range_filter. This explains the
+particular settings page to make it work.
 
 ## Features
 
@@ -23,15 +27,10 @@ based on date range fields.
 
 1. Create or edit a View.
 2. Add a contextual filter for your date field.
-3. Select "Daterange argument" as the handler.
+3. Go to the "Date Range Argument" settings page
+   (/admin/config/content/daterange-argument) to indicate this newly created
+   filter should use the Date Range Argument handler.
 4. Configure the argument settings as needed.
-
-## Example
-
-To filter date ranges that include a specific date, use a URL like:
-```
-/your-view-path/2024-01-01
-```
 
 ## Requirements
 
