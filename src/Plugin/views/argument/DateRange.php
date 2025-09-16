@@ -50,15 +50,28 @@ class DateRange extends Date {
       $end_field = $start_field;
     }
 
-    // Add where conditions for the date range.
-    $this->query->addWhere(0, $start_field, $this->argument, '<=');
+    $connection = $this->query->getConnection();
 
-    // Support empty end field: match if end field is >= argument OR end field
-    // is NULL/empty.
-    $or = $this->query->query->orConditionGroup()
-      ->condition($end_field, $this->argument, '>=')
+    // (date start = argument AND date end IS NULL)
+    $one_day = $connection
+      ->condition('AND')
+      ->condition($start_field, $this->argument, '=')
       ->isNull($end_field);
-    $this->query->addWhere(0, $or);
+
+    // (date start <= argument AND date end >= argument)
+    $interval = $connection
+      ->condition('AND')
+      ->condition($start_field, $this->argument, '<=')
+      ->condition($end_field, $this->argument, '>=');
+
+    // ( ... ) OR ( ... )
+    $date_include = $connection
+      ->condition('OR')
+      ->condition($one_day)
+      ->condition($interval);
+
+    // Add the OR group to the query.
+    $this->query->addWhere(0, $date_include);
   }
 
 }
