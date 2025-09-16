@@ -8,13 +8,6 @@ use Drupal\views\Views;
 
 /**
  * Convert selected contextual filters to daterange_argument filters.
- *
- * From a UI perspective it would make sense to simply have a tick-box on the
- * the Views UI contextual filter config panel. The problem is that at that
- * point the plugin class has already been selected and instantiated.
- * This is why we make the user define the contextual filter first, then have
- * them select on this page which contextual filters need to be converted to
- * range filters.
  */
 class DateRangeArgumentSettingsForm extends ConfigFormBase {
 
@@ -29,18 +22,15 @@ class DateRangeArgumentSettingsForm extends ConfigFormBase {
    * Return the configuration route.
    */
   protected function getEditableConfigNames() {
-    return [
-      'daterange_argument.settings',
-    ];
+    return ['daterange_argument.settings'];
   }
 
   /**
    * Build the form.
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $range_fields = [
-      'date_field_names' => [],
-    ];
+    $date_field_names = [];
+
     $class_path = 'Drupal\views\Plugin\views\argument';
     $argument_info = Views::pluginManager('argument')->getDefinitions();
 
@@ -49,41 +39,31 @@ class DateRangeArgumentSettingsForm extends ConfigFormBase {
       if (views_view_is_disabled($view)) {
         $view_name .= ' (' . $this->t('disabled') . ')';
       }
+
       foreach ($view->get('display') as $display) {
-        if (!empty($display['display_options']['arguments'])) {
+        if (empty($display['display_options']['arguments'])) {
+          continue;
+        }
 
-          foreach ($display['display_options']['arguments'] as $contextual_filter) {
-            $plugin_id = $contextual_filter['plugin_id'];
-            $class = $argument_info[$plugin_id]['class'];
-            // Does this contextual filter class extend one of the base
-            // contextual filter classes?
-            // Note: lists have a class of Numeric or String, so nothing special
-            // needs or can be done for lists...
-            $is_date_handler = is_a($class, "$class_path\Date", TRUE);
+        foreach ($display['display_options']['arguments'] as $argument) {
+          $plugin_id = $argument['plugin_id'];
+          $class = $argument_info[$plugin_id]['class'];
 
-            if ($is_date_handler) {
+          if (!is_a($class, "$class_path\Date", TRUE)) {
+            continue;
+          }
 
-              // For every View $display we get a number of fields.
-              // Should we allow selection per display AND per field?
-              // Currently we find, but don't add, the "duplicates".
-              // @todo Find something more human-readible than this.
-              $title = "$plugin_id: " . $contextual_filter['id'];
+          $title = "$plugin_id: " . $argument['id'];
+          $machine_name = $argument['table'] . ':' . $argument['field'];
 
-              // @todo Taxonomy term depth has Views machine name
-              // "taxonomy_term_data:tid", not "node:term_node_tid_depth".
-              $machine_name = $contextual_filter['table'] . ':' . $contextual_filter['field'];
-
-              if ($is_date_handler) {
-                $title_used = isset($range_fields['date_field_names'][$machine_name][$title]);
-                if (!$title_used || !in_array($view_name, $range_fields['date_field_names'][$machine_name][$title])) {
-                  $range_fields['date_field_names'][$machine_name][$title][] = $view_name;
-                }
-              }
-            }
+          $title_used = isset($date_field_names[$machine_name][$title]);
+          if (!$title_used || !in_array($view_name, $date_field_names[$machine_name][$title])) {
+            $date_field_names[$machine_name][$title][] = $view_name;
           }
         }
       }
     }
+
     $form['field_names'] = [
       '#type' => 'fieldset',
       '#title' => $this->t('Select contextual filters to be converted to daterange argument filters'),
@@ -91,6 +71,7 @@ class DateRangeArgumentSettingsForm extends ConfigFormBase {
     $config = $this->configFactory->get('daterange_argument.settings');
     $labels = [$this->t('date')];
     $label = reset($labels);
+
     foreach ($range_fields as $type => $data) {
       $options = [];
       foreach ($data as $machine_name => $view_names) {
@@ -103,18 +84,22 @@ class DateRangeArgumentSettingsForm extends ConfigFormBase {
         $options[$machine_name] = $this->t('%field in view @views', $replace);
         $form['#view_names'][$machine_name] = $view_names;
       }
+
       $form['field_names'][$type] = [
         '#type' => 'checkboxes',
         '#title' => $this->t('Select which of the below contextual <em>@label</em> filters should be converted to <em>@label range</em> filters:', ['@label' => $label]),
         '#default_value' => $config->get($type) ?: [],
         '#options' => $options,
       ];
+
       $label = next($labels);
     }
+
     $form['actions']['note'] = [
       '#markup' => '<p><em>' . $this->t('Caches will be cleared as part of this operation. This may take a while.') . '</em></p>',
       '#weight' => 1,
     ];
+
     return parent::buildForm($form, $form_state);
   }
 
@@ -170,8 +155,9 @@ class DateRangeArgumentSettingsForm extends ConfigFormBase {
 
           if (isset($display['display_options']['arguments'][$field_name]['plugin_id'])) {
             $plugin_id = in_array($filter_name, $added_filters)
-                        ? 'daterange_argument'
-                        : 'date';
+                       ? 'daterange_argument'
+                       : 'date';
+
             $display['display_options']['arguments'][$field_name]['plugin_id']
               = $plugin_id;
           }
@@ -188,8 +174,7 @@ class DateRangeArgumentSettingsForm extends ConfigFormBase {
     }
 
     $config->save();
-    // We now need to invoke contextual_range_filter_views_data_alter() for the
-    // changes to take effect. We do this by clearing the caches.
+
     drupal_flush_all_caches();
 
     parent::submitForm($form, $form_state);

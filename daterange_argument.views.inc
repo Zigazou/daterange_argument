@@ -10,7 +10,7 @@
 /**
  * Implements hook_views_data_alter().
  *
- * Replaces contextual filter plugins by their corresponding RANGE plugins.
+ * Replaces contextual date argument plugins by daterange_argument plugins.
  *
  * This function finds all field and node property argument handlers. If
  * they're listed on the Date Range Argument configuration page as "to be
