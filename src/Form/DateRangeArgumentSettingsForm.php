@@ -40,8 +40,6 @@ class DateRangeArgumentSettingsForm extends ConfigFormBase {
   public function buildForm(array $form, FormStateInterface $form_state) {
     $range_fields = [
       'date_field_names' => [],
-      'numeric_field_names' => [],
-      'string_field_names' => [],
     ];
     $class_path = 'Drupal\views\Plugin\views\argument';
     $argument_info = Views::pluginManager('argument')->getDefinitions();
@@ -62,12 +60,8 @@ class DateRangeArgumentSettingsForm extends ConfigFormBase {
             // Note: lists have a class of Numeric or String, so nothing special
             // needs or can be done for lists...
             $is_date_handler = is_a($class, "$class_path\Date", TRUE);
-            $is_string_handler = is_a($class, "$class_path\StringArgument", TRUE);
 
-            // Anything that is not a date or string will be shown as numeric.
-            $is_numeric_handler = !$is_date_handler && !$is_string_handler;
-
-            if ($is_date_handler || $is_numeric_handler || $is_string_handler) {
+            if ($is_date_handler) {
 
               // For every View $display we get a number of fields.
               // Should we allow selection per display AND per field?
@@ -95,7 +89,7 @@ class DateRangeArgumentSettingsForm extends ConfigFormBase {
       '#title' => $this->t('Select contextual filters to be converted to daterange argument filters'),
     ];
     $config = $this->configFactory->get('daterange_argument.settings');
-    $labels = [$this->t('date'), $this->t('numeric'), $this->t('string')];
+    $labels = [$this->t('date')];
     $label = reset($labels);
     foreach ($range_fields as $type => $data) {
       $options = [];
