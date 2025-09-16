@@ -16,7 +16,7 @@ use Drupal\views\Views;
  * them select on this page which contextual filters need to be converted to
  * range filters.
  */
-class DateRangeArgumentAssignmentForm extends ConfigFormBase {
+class DateRangeArgumentSettingsForm extends ConfigFormBase {
 
   /**
    * Return the form id.

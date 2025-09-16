@@ -6,5 +6,4 @@ package: "Views"
 version: "1.0.0"
 dependencies:
   - drupal:views
-  - drupal:date
 configure: daterange_argument.settings
