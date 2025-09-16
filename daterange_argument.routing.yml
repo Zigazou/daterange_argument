@@ -1,0 +1,6 @@
+daterange_argument.settings:
+  path: '/admin/config/content/daterange-argument'
+  defaults:
+    _form: 'Drupal\daterange_argument\Form\DateRangeArgumentSettingsForm'
+  requirements:
+    _permission: 'administer date range arguments'

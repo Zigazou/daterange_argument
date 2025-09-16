@@ -1,0 +1,5 @@
+daterange_argument.admin:
+  title: "Date Range Argument"
+  description: "Date range argument settings form."
+  parent: system.admin_config_ui
+  route_name: daterange_argument.settings

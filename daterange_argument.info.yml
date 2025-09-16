@@ -1,8 +1,10 @@
-name: 'Daterange Argument'
+name: "Daterange Argument"
 type: module
-description: 'Provides a daterange argument handler for Views.'
+description: "Provides a daterange argument handler for Views."
 core_version_requirement: ^11
-package: 'Views'
-version: '1.0.0'
+package: "Views"
+version: "1.0.0"
 dependencies:
   - drupal:views
+  - drupal:date
+configure: daterange_argument.settings
