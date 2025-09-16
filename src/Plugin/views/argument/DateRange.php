@@ -57,8 +57,8 @@ class DateRange extends Date {
     }
 
     // Add where conditions for the date range.
-    $this->query->addWhere(0, $start_field, $this->argument, '<=');
-    $this->query->addWhere(0, $end_field, $this->argument, '>=');
+    $this->query->addWhere(0, $start_field, $this->argument, '>=');
+    $this->query->addWhere(0, $end_field, $this->argument, '<=');
   }
 
 }
